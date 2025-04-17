@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: orderservice
+  labels:
+    app: orderservice
+    service: orderservice
+spec:
+  ports:
+    - port: 8082
+  selector:
+    app: orderservice
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orderservice-v1
+  labels:
+    app: orderservice
+    version: v1
+spec:
+  selector:
+    matchLabels:
+      app: orderservice
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: orderservice
+        version: v1
+    spec:
+      containers:
+      - image: <DockerHubAccount>/order-service:version1
+        name: order-service-container
+        env:
+        - name: spring.datasource.url
+          value: jdbc:mysql://shop-mysql:3306/shop?serverTimezone=Europe/Berlin
+        - name: spring.datasource.username
+          value: <Username>
+        - name: spring.datasource.password
+          value: <Password>
+        ports:
+        - containerPort: 8082

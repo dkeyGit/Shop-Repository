@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: shop-mysql
+  labels:
+    app: shop-mysql
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: shop-mysql
+    tier: mysql
+  clusterIP: None
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+  labels:
+    app: shop-mysql
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: shop-mysql
+  labels:
+    app: shop-mysql
+spec:
+  selector:
+    matchLabels:
+      app: shop-mysql
+      tier: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: shop-mysql
+        tier: mysql
+    spec:
+      containers:
+      - image: mysql
+        name: shop-mysql
+        env:
+        - name: MYSQL_DATABASE
+          value: <DatabaseName>
+        - name: MYSQL_USER
+          value: <Username>
+        - name: MYSQL_PASSWORD
+          value: <Password>
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass
+              key: password
+        ports:
+        - containerPort: 3306
+          name: shop-mysql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim

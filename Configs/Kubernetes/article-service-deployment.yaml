@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: articleservice
+  labels:
+    app: articleservice
+    service: articleservice
+spec:
+  ports:
+    - port: 8081
+  selector:
+    app: articleservice
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: articleservice-v1
+  labels:
+    app: articleservice
+    version: v1
+spec:
+  selector:
+    matchLabels:
+      app: articleservice
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: articleservice
+        version: v1
+    spec:
+      containers:
+      - image: <DockerHubAccount>/article-service:version1
+        name: article-service-container
+        env:
+        - name: spring.datasource.url
+          value: jdbc:mysql://shop-mysql:3306/shop?serverTimezone=Europe/Berlin
+        - name: spring.datasource.username
+          value: <Username>
+        - name: spring.datasource.password
+          value: <Password>
+        ports:
+        - containerPort: 8081
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: articleservice-v2
+  labels:
+    app: articleservice
+    version: v2
+spec:
+  selector:
+    matchLabels:
+      app: articleservice
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: articleservice
+        version: v2
+    spec:
+      containers:
+      - image: <DockerHubAccount>/article-service:version2
+        name: article-service-container
+        env:
+        - name: spring.datasource.url
+          value: jdbc:mysql://shop-mysql:3306/shop?serverTimezone=Europe/Berlin
+        - name: spring.datasource.username
+          value: <Username>
+        - name: spring.datasource.password
+          value: <Password>
+        ports:
+        - containerPort: 8081

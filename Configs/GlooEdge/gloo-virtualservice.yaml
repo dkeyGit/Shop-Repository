@@ -1,0 +1,33 @@
+apiVersion: gateway.solo.io/v1
+kind: VirtualService
+metadata:
+  name: gloo-virtualservice
+  namespace: gloo-system
+spec:
+  virtualHost:
+    domains:
+    - '*'
+    routes:
+    - matchers:
+      - prefix: '/articles'
+      routeAction:
+        single:
+          upstream:
+            name: default-articleservice-8081
+            namespace: gloo-system
+    - matchers:
+      - prefix: '/customers'
+      routeAction:
+        single:
+          upstream:
+            name: default-customerservice-8083
+            namespace: gloo-system
+    - matchers:
+      - prefix: '/orders'
+      routeAction:
+        single:
+          upstream:
+            name: default-orderservice-8082
+            namespace: gloo-system
+
+

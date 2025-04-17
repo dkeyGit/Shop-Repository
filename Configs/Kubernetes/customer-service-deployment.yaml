@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: customerservice
+  labels:
+    app: customerservice
+    service: customerservice
+spec:
+  ports:
+    - port: 8083
+  selector:
+    app: customerservice
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customerservice-v1
+  labels:
+    app: customerservice
+    version: v1
+spec:
+  selector:
+    matchLabels:
+      app: customerservice
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: customerservice
+        version: v1
+    spec:
+      containers:
+      - image: <DockerHubAccount>/customer-service:version1
+        name: customer-service-container
+        env:
+        - name: spring.datasource.url
+          value: jdbc:mysql://shop-mysql:3306/shop?serverTimezone=Europe/Berlin
+        - name: spring.datasource.username
+          value: <Username>
+        - name: spring.datasource.password
+          value: <Password>
+        ports:
+        - containerPort: 8083
